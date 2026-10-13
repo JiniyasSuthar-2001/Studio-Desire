@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Studio Desire — An editorial architecture and interior design archive celebrating material, spatial proportion, and refined contemporary spaces." />
+  <title>STUDIO DESIRE — Architectural Interior Archive</title>
+
+  <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Studio Desire Editorial Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       HEADER / NAVIGATION
+       ======================================================================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <!-- Studio Brand Text (No logo mark as requested) -->
+      <a href="#projects" class="brand-logo" aria-label="Studio Desire Home">
+        <span class="brand-name">STUDIO DESIRE</span>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-desktop" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li><a href="#projects" class="nav-link active" data-route="projects">Projects</a></li>
+          <li><a href="#3d" class="nav-link" data-route="3d">3D</a></li>
+          <li><a href="#blueprint" class="nav-link" data-route="blueprint">Blueprint</a></li>
+          <li><a href="#planning" class="nav-link" data-route="planning">Planning</a></li>
+          <li><a href="#products" class="nav-link" data-route="products">Products</a></li>
+          <li><a href="#about" class="nav-link" data-route="about">About</a></li>
+          <li><a href="#contact" class="nav-link" data-route="contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <nav aria-label="Mobile Navigation">
+      <ul class="mobile-nav-list">
+        <li><a href="#projects" class="mobile-nav-link active" data-route="projects">Projects</a></li>
+        <li><a href="#3d" class="mobile-nav-link" data-route="3d">3D</a></li>
+        <li><a href="#blueprint" class="mobile-nav-link" data-route="blueprint">Blueprint</a></li>
+        <li><a href="#planning" class="mobile-nav-link" data-route="planning">Planning</a></li>
+        <li><a href="#products" class="mobile-nav-link" data-route="products">Products</a></li>
+        <li><a href="#about" class="mobile-nav-link" data-route="about">About</a></li>
+        <li><a href="#contact" class="mobile-nav-link" data-route="contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="mobile-drawer-footer">
+      <p>STUDIO DESIRE · Interior Design Archive</p>
+      <p style="font-size: 0.6875rem; margin-top: 0.5rem;">Prototype Demonstration Mode</p>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN APPLICATION CONTENT
+       ======================================================================== -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ======================================================================
+         PAGE 1: PROJECTS / PROJECT ARCHIVE
+         ====================================================================== -->
+    <section class="projects-view" id="projectsView">
+      
+      <!-- Page Hero / Editorial Header -->
+      <div class="page-hero">
+        <div class="container">
+          <div class="hero-meta-badge">
+            <span class="section-number">01</span>
+            <span class="section-divider-line"></span>
+            <span class="section-tag">PROJECT ARCHIVE</span>
+          </div>
+          <div class="hero-title-row">
+            <h1 class="page-title">PROJECTS</h1>
+            <p class="hero-statement">
+              A collection of interior spaces, designed with purpose, material and detail.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Project Hero Section -->
+      <section class="featured-project-section">
+        <div class="container" id="featuredProjectContainer">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </section>
+
+      <!-- Archive Filters & Controls -->
+      <section class="archive-controls-section">
+        <div class="container">
+          <div class="archive-controls-bar">
+            <!-- Category Filter Tabs -->
+            <ul class="category-filter-list" id="categoryFiltersList" role="tablist" aria-label="Project Categories">
+              <!-- Populated dynamically via app.js -->
+            </ul>
+
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+              <span class="project-counter" id="projectCounter">[ 10 Spaces Indexed ]</span>
+
+              <!-- Media View Switcher: ALL / PHOTOS / VIDEOS -->
+              <div class="media-filter-segment" id="mediaFiltersContainer" role="group" aria-label="Media format filter">
+                <!-- Populated dynamically via app.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Asymmetric Editorial Project Grid -->
+          <div class="editorial-grid" id="editorialGrid" role="region" aria-label="Projects Grid">
+            <!-- Populated dynamically via app.js -->
+          </div>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- ======================================================================
+         FUNCTIONAL PLACEHOLDER VIEW (COMING SOON)
+         ====================================================================== -->
+    <section class="placeholder-view" id="placeholderView" role="region" aria-label="Section Placeholder">
+      <div class="container">
+        <div class="placeholder-container">
+          <div class="placeholder-meta-code" id="placeholderCode">02</div>
+          <h1 class="placeholder-section-title" id="placeholderTitle">3D VISUALIZATION</h1>
+          <div class="placeholder-status-badge">COMING SOON</div>
+          
+          <p class="placeholder-desc" id="placeholderDesc">
+            This section of Studio Desire is currently being prepared.
+          </p>
+          
+          <p class="placeholder-subtext" id="placeholderNote">
+            Spatial renderings, photorealistic atmospheric lighting studies, and CGI architecture archives will be showcased here.
+          </p>
+
+          <div style="margin: 2.5rem 0; padding: 2rem; background: var(--bg-card); border: 1px solid var(--border-hairline); max-width: 520px; margin-left: auto; margin-right: auto; text-align: left;">
+            <p style="font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;">
+              Archival Modules in Development
+            </p>
+            <ul id="placeholderFeaturesList" style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Populated dynamically via router.js -->
+            </ul>
+          </div>
+
+          <div class="placeholder-action-row">
+            <a href="#projects" class="btn-primary-editorial">
+              <span>← Return to Projects</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       PROJECT DETAIL ARCHITECTURAL DOSSIER (MODAL)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="projectDetailModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-container" id="modalContainer">
+      
+      <!-- Sticky Modal Header -->
+      <header class="modal-header">
+        <div class="modal-header-meta">
+          <span id="modalIndexBadge">PROJECT-01</span>
+          <span>·</span>
+          <span id="modalCategoryBadge">RESIDENTIAL · 2026</span>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close project detail dossier">
+            ✕
+          </button>
+        </div>
+      </header>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <h2 class="modal-project-title" id="modalTitle">Residence 01</h2>
+        <p class="modal-project-subtitle" id="modalSubtitle">Minimalist Haven with Natural Travertine & Raw Oak</p>
+
+        <!-- Specifications Matrix -->
+        <div class="project-spec-grid">
+          <div class="spec-item">
+            <span class="spec-label">Location</span>
+            <span class="spec-value" id="specLocation">Ahmedabad</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Category</span>
+            <span class="spec-value" id="specCategory">Residential</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Year</span>
+            <span class="spec-value" id="specYear">2026</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Scale</span>
+            <span class="spec-value" id="specArea">6,400 sq.ft</span>
+          </div>
+        </div>
+
+        <!-- Architectural Narrative -->
+        <div class="modal-narrative-section">
+          <div class="narrative-headline">Design Narrative</div>
+          <p class="narrative-body" id="modalDescription"></p>
+        </div>
+
+        <!-- Video Player Section (Rendered when project has motion) -->
+        <div class="modal-video-section" id="modalVideoSection" style="display: none;">
+          <div class="section-label">
+            <span>Spatial Motion & Atmosphere</span>
+            <span style="font-size: 0.6875rem; color: var(--accent-warm);">4K Walkthrough</span>
+          </div>
+          <div id="modalVideoContainer"></div>
+        </div>
+
+        <!-- Photo Gallery Section -->
+        <div class="modal-gallery-section">
+          <div class="section-label">
+            <span>Archival Photo Gallery</span>
+            <span style="font-size: 0.6875rem; color: var(--text-muted);">Click to expand</span>
+          </div>
+          <div class="gallery-stack" id="modalGalleryStack"></div>
+        </div>
+
+        <!-- Previous / Next Project Navigation -->
+        <div class="modal-pagination">
+          <button class="pagination-btn" id="modalPrevBtn">
+            <span>← Previous Space</span>
+          </button>
+          <button class="pagination-btn" id="modalNextBtn">
+            <span>Next Space →</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       FULLSCREEN LIGHTBOX FOR HIGH-RESOLUTION PHOTO VIEWING
+       ======================================================================== -->
+  <div class="lightbox-backdrop" id="lightboxModal" role="dialog" aria-modal="true" aria-label="Fullscreen image viewer">
+    <button class="lightbox-close-btn" id="lightboxCloseBtn" aria-label="Close full size photo">✕</button>
+    <button class="lightbox-nav-btn lightbox-prev" id="lightboxPrevBtn" aria-label="Previous photo">←</button>
+    <button class="lightbox-nav-btn lightbox-next" id="lightboxNextBtn" aria-label="Next photo">→</button>
+
+    <div class="lightbox-content-box">
+      <img src="" alt="" class="lightbox-image" id="lightboxImage" />
+      <div class="lightbox-caption-bar">
+        <span id="lightboxCaption"></span>
+        <span id="lightboxCounter" style="opacity: 0.6;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MINIMAL EDITORIAL FOOTER
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top-row">
+        <div class="footer-brand">
+          <div class="footer-brand-title">STUDIO DESIRE</div>
+          <p class="footer-tagline">
+            Architecture and interior design studio dedicated to material integrity, light, and timeless spatial atmospheres.
+          </p>
+        </div>
+
+        <nav class="footer-nav" aria-label="Footer Navigation">
+          <div class="footer-nav-col">
+            <span class="footer-nav-title">Archive</span>
+            <a href="#projects" class="footer-link active" data-route="projects">Projects</a>
+            <a href="#3d" class="footer-link" data-route="3d">3D Visualization</a>
+            <a href="#blueprint" class="footer-link" data-route="blueprint">Blueprint</a>
+          </div>
+          <div class="footer-nav-col">
+            <span class="footer-nav-title">Practice</span>
+            <a href="#planning" class="footer-link" data-route="planning">Planning</a>
+            <a href="#products" class="footer-link" data-route="products">Products</a>
+          </div>
+          <div class="footer-nav-col">
+            <span class="footer-nav-title">Studio</span>
+            <a href="#about" class="footer-link" data-route="about">About</a>
+            <a href="#contact" class="footer-link" data-route="contact">Contact</a>
+            <a href="frontend/index.html#owner/login" class="footer-link" style="color: #666; font-family: monospace; font-size: 0.75rem; text-transform: uppercase; margin-top: 0.25rem;">Owner Login</a>
+          </div>
+        </nav>
+      </div>
+
+      <div class="footer-bottom-row">
+        <div>
+          <span>© 2026 Studio Desire. All architectural rights reserved.</span>
+        </div>
+        <div class="footer-prototype-note" style="display: flex; align-items: center; gap: 1rem;">
+          <span>Studio Archive v1.0</span>
+          <span>·</span>
+          <a href="frontend/index.html#owner/login" style="color: #555; text-decoration: underline; font-family: monospace; font-size: 0.72rem; text-transform: uppercase;">Owner Login</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Scripts (Supports file:/// and http://) -->
+  <script src="data/projects.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
