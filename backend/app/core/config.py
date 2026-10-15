@@ -46,7 +46,7 @@ class Settings:
         # CORS Origins
         self.CORS_ORIGINS_RAW = os.getenv(
             "CORS_ORIGINS",
-            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000"
+            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,http://localhost:5175,http://127.0.0.1:5175,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000"
         )
 
         # Security & Auth
@@ -78,17 +78,57 @@ class Settings:
         self.INITIAL_ADMIN_EMAIL = os.getenv("INITIAL_ADMIN_EMAIL", "studiodesire01@gmail.com")
         self.INITIAL_ADMIN_PASSWORD = os.getenv("INITIAL_ADMIN_PASSWORD", "")
 
-        # Google OAuth Calendar Integration
+        # Google OAuth Calendar Integration & Frontend URL
+        self.FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
         self.GOOGLE_CALENDAR_CLIENT_ID = os.getenv("GOOGLE_CALENDAR_CLIENT_ID", "")
         self.GOOGLE_CALENDAR_CLIENT_SECRET = os.getenv("GOOGLE_CALENDAR_CLIENT_SECRET", "")
         self.GOOGLE_CALENDAR_REDIRECT_URI = os.getenv(
             "GOOGLE_CALENDAR_REDIRECT_URI",
-            "http://localhost:8000/api/google-calendar/oauth/callback"
+            "http://localhost:8000/api/admin/google-calendar/oauth/callback"
         )
         self.GOOGLE_CALENDAR_SCOPES = os.getenv(
             "GOOGLE_CALENDAR_SCOPES",
-            "https://www.googleapis.com/auth/calendar.events"
+            "https://www.googleapis.com/auth/calendar.events openid email"
         )
+
+    def validate_google_calendar_configuration(self) -> dict:
+        """
+        Validates Google Calendar OAuth configuration.
+        Returns a dict with 'valid': bool, 'errors': List[str], 'warnings': List[str], 'configured': bool.
+        """
+        errors = []
+        warnings = []
+        client_id = (self.GOOGLE_CALENDAR_CLIENT_ID or "").strip()
+        client_secret = (self.GOOGLE_CALENDAR_CLIENT_SECRET or "").strip()
+        redirect_uri = (self.GOOGLE_CALENDAR_REDIRECT_URI or "").strip()
+        frontend_url = (self.FRONTEND_URL or "").strip()
+        scopes = (self.GOOGLE_CALENDAR_SCOPES or "").strip()
+
+        placeholder_patterns = {"demo_google_client_id", "placeholder", "changeme", "your-client-id"}
+        if not client_id or client_id.lower() in placeholder_patterns:
+            errors.append("GOOGLE_CALENDAR_CLIENT_ID is missing or configured with a placeholder.")
+        if not client_secret or client_secret.lower() in placeholder_patterns:
+            errors.append("GOOGLE_CALENDAR_CLIENT_SECRET is missing or configured with a placeholder.")
+
+        if not redirect_uri:
+            errors.append("GOOGLE_CALENDAR_REDIRECT_URI is not set.")
+        elif "/admin/google-calendar/oauth/callback" not in redirect_uri:
+            errors.append(
+                f"GOOGLE_CALENDAR_REDIRECT_URI ('{redirect_uri}') does not match the mounted router path '/api/admin/google-calendar/oauth/callback'."
+            )
+
+        if not frontend_url:
+            errors.append("FRONTEND_URL is not set.")
+
+        if "calendar.events" not in scopes:
+            warnings.append("GOOGLE_CALENDAR_SCOPES does not include 'https://www.googleapis.com/auth/calendar.events'.")
+
+        return {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "configured": bool(client_id and client_secret and client_id.lower() not in placeholder_patterns)
+        }
 
     @property
     def IS_PRODUCTION(self) -> bool:
@@ -123,7 +163,7 @@ class Settings:
                 "CRITICAL CORS CONFIGURATION ERROR: Wildcard '*' origins cannot be used in production with credentials. "
                 "Specify explicit allowed origins in CORS_ORIGINS (e.g. 'https://studiodesire.com')."
             )
-        return clean_origins if clean_origins else ["http://localhost:5173", "http://127.0.0.1:5173"]
+        return clean_origins if clean_origins else ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
 
     def validate_security_configuration(self) -> None:
         """Validates that production settings meet all security invariants."""

@@ -231,6 +231,18 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({
     }
   };
 
+  const handleDeleteMilestone = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this milestone?")) return;
+    try {
+      await adminService.deleteProjectMilestone(id);
+      setMilestones(milestones.filter(item => item.id !== id));
+      const reloaded = await adminService.getProjectWorkspace(projectId);
+      setWorkspace(reloaded);
+    } catch (err: any) {
+      alert("Failed to delete milestone: " + err.message);
+    }
+  };
+
   const handleSaveProjectEdits = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -641,6 +653,14 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({
                       Reopen
                     </button>
                   )}
+                  <button
+                    className="admin-btn admin-btn-danger"
+                    style={{ padding: "0.4rem 0.8rem", fontSize: "0.68rem" }}
+                    onClick={() => handleDeleteMilestone(m.id)}
+                    title="Delete Milestone"
+                  >
+                    ✕
+                  </button>
                 </div>
               </div>
             ))}

@@ -725,6 +725,21 @@ def update_project_milestone(
     return milestone
 
 
+@router.delete("/milestones/{milestone_id}", summary="Delete milestone")
+def delete_project_milestone(
+    milestone_id: int,
+    current_user: User = Depends(require_roles(["OWNER", "MASTER", "ADMIN", "PROJECT_MANAGER"])),
+    db: Session = Depends(get_db)
+):
+    milestone = db.query(ProjectMilestone).filter(ProjectMilestone.id == milestone_id).first()
+    if not milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+
+    db.delete(milestone)
+    db.commit()
+    return {"success": True, "message": "Milestone deleted successfully"}
+
+
 @router.patch("/{project_id}/publish", summary="Toggle project publish/draft status")
 def toggle_publish_status(
     project_id: int,

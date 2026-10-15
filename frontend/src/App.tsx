@@ -39,27 +39,31 @@ export const App: React.FC = () => {
         window.location.hash = "#contact";
       }
 
+      // Split path from query parameters (e.g. owner/dashboard?tab=meetings&calendar_connected=true)
+      const [pathPart] = cleanHash.split("?");
+
       // Check browser pathname as well
       const pathname = window.location.pathname.toLowerCase();
+      let targetPath = pathPart;
       if (pathname.includes("owner/login")) {
-        cleanHash = "owner/login";
+        targetPath = "owner/login";
       } else if (pathname.includes("owner/dashboard")) {
-        cleanHash = "owner/dashboard";
+        targetPath = "owner/dashboard";
       }
 
-      if (cleanHash.startsWith("project/")) {
-        const slug = rawHash.replace(/^project\//i, "");
+      if (targetPath.startsWith("project/")) {
+        const slug = rawHash.replace(/^project\//i, "").split("?")[0];
         setCurrentRoute("projects");
         setSelectedProjectSlug(slug);
         setSelectedProductSlug(null);
         document.title = "Studio Desire | Project Dossier";
-      } else if (cleanHash.startsWith("product/")) {
-        const slug = rawHash.replace(/^product\//i, "");
+      } else if (targetPath.startsWith("product/")) {
+        const slug = rawHash.replace(/^product\//i, "").split("?")[0];
         setCurrentRoute("products");
         setSelectedProductSlug(slug);
         setSelectedProjectSlug(null);
         document.title = "Studio Desire | Product Archive";
-      } else if (cleanHash.startsWith("gallery")) {
+      } else if (targetPath.startsWith("gallery")) {
         let cat = "ALL";
         const catMatch = rawHash.match(/category=([^&]+)/i);
         if (catMatch) {
@@ -76,21 +80,21 @@ export const App: React.FC = () => {
 
         // Normalize owner routes and enforce protection
         const isAuth = authService.isAuthenticated();
-        if (cleanHash === "admin") {
-          cleanHash = isAuth ? "owner/dashboard" : "owner/login";
+        if (targetPath === "admin") {
+          targetPath = isAuth ? "owner/dashboard" : "owner/login";
         }
 
-        if (cleanHash === "owner/dashboard" && !isAuth) {
-          cleanHash = "owner/login";
+        if (targetPath === "owner/dashboard" && !isAuth) {
+          targetPath = "owner/login";
           window.location.hash = "#owner/login";
-        } else if (cleanHash === "owner/login" && isAuth) {
-          cleanHash = "owner/dashboard";
+        } else if (targetPath === "owner/login" && isAuth) {
+          targetPath = "owner/dashboard";
           window.location.hash = "#owner/dashboard";
         }
 
-        setCurrentRoute(cleanHash);
+        setCurrentRoute(targetPath);
 
-        switch (cleanHash) {
+        switch (targetPath) {
           case "products":
             document.title = "Studio Desire | Products";
             break;

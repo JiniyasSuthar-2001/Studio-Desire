@@ -104,8 +104,14 @@ class EmailSettingsSchema(BaseModel):
     smtp_username: str = ""
     smtp_password: Optional[str] = None
     recipients: List[str] = ["studiodesire01@gmail.com"]
-    send_customer_confirmation: bool = True
+    send_customer_confirmation: Optional[bool] = None
+    customer_confirmation_enabled: Optional[bool] = None
 
 
 class EmailTestSchema(BaseModel):
     recipient: Optional[str] = None
+    to_email: Optional[str] = None
+
+    @property
+    def target_recipient(self) -> Optional[str]:
+        return self.recipient or self.to_email

@@ -497,6 +497,7 @@ def get_admin_email_settings(
     masked_cfg = dict(cfg)
     masked_cfg["smtp_password"] = "••••••••" if has_pwd else ""
     masked_cfg["has_password"] = has_pwd
+    masked_cfg["customer_confirmation_enabled"] = cfg.get("send_customer_confirmation", True)
     return masked_cfg
 
 
@@ -506,7 +507,9 @@ def update_admin_email_settings(
     current_user: User = Depends(require_roles(["OWNER", "MASTER", "ADMIN"])),
     db: Session = Depends(get_db)
 ):
-    data = payload.model_dump()
+    data = payload.model_dump(exclude_unset=True)
+    if data.get("customer_confirmation_enabled") is not None and data.get("send_customer_confirmation") is None:
+        data["send_customer_confirmation"] = data["customer_confirmation_enabled"]
     save_email_settings(data, updated_by=current_user.username)
     log_activity(
         db, current_user,
@@ -515,7 +518,15 @@ def update_admin_email_settings(
         entity_id="email",
         details="Updated SMTP email server configuration"
     )
-    return {"success": True, "message": "Email settings updated successfully."}
+    updated_cfg = get_email_settings()
+    has_pwd = bool(updated_cfg.get("smtp_password"))
+    masked_cfg = dict(updated_cfg)
+    masked_cfg["smtp_password"] = "••••••••" if has_pwd else ""
+    masked_cfg["has_password"] = has_pwd
+    masked_cfg["customer_confirmation_enabled"] = updated_cfg.get("send_customer_confirmation", True)
+    masked_cfg["success"] = True
+    masked_cfg["message"] = "Email settings updated successfully."
+    return masked_cfg
 
 
 @router.post("/email/test", summary="Send a test email to verify SMTP configuration")
@@ -525,7 +536,7 @@ def test_email_configuration(
     db: Session = Depends(get_db)
 ):
     cfg = get_email_settings()
-    recipient = payload.recipient or (cfg.get("recipients", [])[0] if cfg.get("recipients") else cfg.get("sender_email"))
+    recipient = payload.target_recipient or (cfg.get("recipients", [])[0] if cfg.get("recipients") else cfg.get("sender_email"))
     if not recipient:
         raise HTTPException(status_code=400, detail="No recipient specified and no default recipient configured.")
 

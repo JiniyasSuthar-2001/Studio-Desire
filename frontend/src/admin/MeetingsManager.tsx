@@ -33,10 +33,16 @@ export const MeetingsManager: React.FC = () => {
   // Google Calendar Integration state
   const [googleStatus, setGoogleStatus] = useState<{
     connected: boolean;
+    status?: string;
     google_account_email?: string;
     calendar_id?: string;
+    last_synced_at?: string;
     updated_at?: string;
+    client_id_configured?: boolean;
+    configuration_valid?: boolean;
+    configuration_errors?: string[];
   }>({ connected: false });
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
   // Calendar View controls
   const [currentView, setCurrentView] = useState<CalendarView>("month");
@@ -64,24 +70,32 @@ export const MeetingsManager: React.FC = () => {
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
 
   useEffect(() => {
-    loadData();
     checkOAuthCallback();
+    loadData();
   }, []);
 
   const checkOAuthCallback = () => {
     const hash = window.location.hash;
-    if (hash.includes("calendar_connected=true")) {
-      // Clear query param from hash without full page reload
-      const cleanHash = hash.replace("?calendar_connected=true", "").replace("&calendar_connected=true", "");
-      window.history.replaceState(null, "", cleanHash);
-    } else if (hash.includes("calendar_error=")) {
-      const match = hash.match(/calendar_error=([^&]+)/);
-      if (match) {
-        const errorMsg = decodeURIComponent(match[1]);
-        setError("Google Calendar Connection Error: " + errorMsg);
-        const cleanHash = hash.replace(/[\?&]calendar_error=[^&]+/, "");
-        window.history.replaceState(null, "", cleanHash);
-      }
+    const searchString = hash.includes("?") ? hash.substring(hash.indexOf("?")) : "";
+    const params = new URLSearchParams(searchString);
+
+    if (params.get("calendar_connected") === "true") {
+      setSuccessNotice("Google Calendar successfully connected! Real-time two-way synchronization is active.");
+      const cleanHash = hash.replace(/[\?&]calendar_connected=true/, "").replace(/[\?&]tab=meetings/, "");
+      window.history.replaceState(null, "", cleanHash.includes("?") ? cleanHash : cleanHash.replace("?", ""));
+    } else if (params.get("calendar_error")) {
+      const errCode = params.get("calendar_error") || "";
+      const friendlyMessages: Record<string, string> = {
+        access_denied: "Google authorization was cancelled or denied.",
+        missing_code_or_state: "Authorization was incomplete (missing authorization code or state token).",
+        invalid_or_expired_state: "The authorization session expired or is invalid. Please try connecting again.",
+        token_exchange_failed: "Failed to exchange authorization tokens with Google. Please verify Google Cloud OAuth configuration.",
+        insufficient_permissions: "Google account connected, but lacked necessary calendar access permissions.",
+        config_error: "Google Calendar OAuth is not properly configured on the server."
+      };
+      setError("Google Calendar Connection: " + (friendlyMessages[errCode] || decodeURIComponent(errCode)));
+      const cleanHash = hash.replace(/[\?&]calendar_error=[^&]+/, "").replace(/[\?&]tab=meetings/, "");
+      window.history.replaceState(null, "", cleanHash.includes("?") ? cleanHash : cleanHash.replace("?", ""));
     }
   };
 
@@ -93,7 +107,7 @@ export const MeetingsManager: React.FC = () => {
         adminService.getMeetings(),
         adminService.getProjects(),
         adminService.getClients(),
-        adminService.getGoogleCalendarStatus().catch(() => ({ connected: false })),
+        adminService.getGoogleCalendarStatus().catch(() => ({ connected: false, status: "DISCONNECTED" })),
         adminService.getMergedCalendarEvents().catch(() => [])
       ]);
       const normalizedEvents: CalendarEvent[] = (events || []).map((evt: any) => ({
@@ -143,11 +157,17 @@ export const MeetingsManager: React.FC = () => {
 
   const handleSyncNow = async () => {
     setSyncing(true);
+    setError(null);
     try {
-      await adminService.syncGoogleCalendar();
+      const res = await adminService.syncGoogleCalendar();
+      if (res.success) {
+        setSuccessNotice(res.message || "Google Calendar synchronized successfully.");
+      } else {
+        setError(`Synchronization notice: ${res.message}`);
+      }
       await loadData();
     } catch (err: any) {
-      alert("Google Calendar sync error: " + err.message);
+      setError("Google Calendar sync error: " + err.message);
     } finally {
       setSyncing(false);
     }
@@ -157,9 +177,10 @@ export const MeetingsManager: React.FC = () => {
     try {
       await adminService.disconnectGoogleCalendar();
       setShowDisconnectConfirm(false);
+      setSuccessNotice("Google Calendar disconnected.");
       await loadData();
     } catch (err: any) {
-      alert("Failed to disconnect Google Calendar: " + err.message);
+      setError("Failed to disconnect Google Calendar: " + err.message);
     }
   };
 
@@ -288,6 +309,39 @@ export const MeetingsManager: React.FC = () => {
 
   return (
     <div>
+      {/* SUCCESS NOTIFICATION BANNER */}
+      {successNotice && (
+        <div
+          style={{
+            background: "#ecfdf5",
+            border: "1px solid #10b981",
+            color: "#065f46",
+            padding: "0.85rem 1.25rem",
+            borderRadius: "10px",
+            marginBottom: "1.25rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "0.86rem"
+          }}
+        >
+          <span>✓ {successNotice}</span>
+          <button
+            onClick={() => setSuccessNotice(null)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#065f46",
+              cursor: "pointer",
+              fontWeight: "bold",
+              fontSize: "1rem"
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* SECTION 1: GOOGLE CALENDAR CONNECTION BAR */}
       <div 
         className="admin-surface-card" 
@@ -316,14 +370,21 @@ export const MeetingsManager: React.FC = () => {
                 Not Connected
               </span>
             )}
+            {googleStatus.configuration_valid === false && (
+              <span className="badge-demo badge-warning" style={{ marginLeft: "0.4rem" }}>
+                Config Required
+              </span>
+            )}
           </div>
           <p style={{ margin: "0.4rem 0 0", fontSize: "0.76rem", color: "var(--admin-text-muted)", fontFamily: "var(--admin-font-mono)" }}>
             {googleStatus.connected ? (
               <>
-                Account: <strong style={{ color: "var(--admin-text-main)" }}>{googleStatus.google_account_email}</strong> | Calendar: {googleStatus.calendar_id || "Primary"} | Last Sync: {googleStatus.updated_at ? new Date(googleStatus.updated_at).toLocaleString() : "Just now"}
+                Account: <strong style={{ color: "var(--admin-text-main)" }}>{googleStatus.google_account_email}</strong> | Calendar: {googleStatus.calendar_id || "Primary"} | Last Sync: {googleStatus.last_synced_at || googleStatus.updated_at ? new Date(googleStatus.last_synced_at || googleStatus.updated_at!).toLocaleString() : "Never"}
               </>
             ) : (
-              "Connect your Google account to achieve real-time two-way synchronization for Studio Desire consultations, site visits, and project milestones."
+              googleStatus.configuration_errors && googleStatus.configuration_errors.length > 0
+                ? `Configuration notice: ${googleStatus.configuration_errors.join(", ")}`
+                : "Connect your Google account to achieve real-time two-way synchronization for Studio Desire consultations, site visits, and project milestones."
             )}
           </p>
         </div>

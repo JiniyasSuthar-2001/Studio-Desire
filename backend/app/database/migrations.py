@@ -501,5 +501,24 @@ def run_migrations(engine: Engine):
         except Exception as e:
             print(f"[DB MIGRATION NOTE] Category representative reconciliation: {e}")
 
+        # 14. Ensure 'google_oauth_states' table exists for single-use OAuth state protection
+        try:
+            if not table_exists("google_oauth_states"):
+                conn.execute(text("""
+                    CREATE TABLE IF NOT EXISTS google_oauth_states (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        state VARCHAR(255) UNIQUE NOT NULL,
+                        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                        created_at DATETIME NOT NULL,
+                        expires_at DATETIME NOT NULL,
+                        used INTEGER NOT NULL DEFAULT 0
+                    );
+                """))
+                conn.execute(text("CREATE INDEX IF NOT EXISTS ix_google_oauth_states_state ON google_oauth_states (state);"))
+                conn.execute(text("CREATE INDEX IF NOT EXISTS ix_google_oauth_states_user_id ON google_oauth_states (user_id);"))
+                print("[DB MIGRATION] Created table 'google_oauth_states' for OAuth security")
+        except Exception as e:
+            print(f"[DB MIGRATION NOTE] google_oauth_states table creation: {e}")
+
         conn.commit()
 

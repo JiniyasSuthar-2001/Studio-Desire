@@ -41,3 +41,17 @@ class CalendarSyncItem(Base):
     sync_status = Column(String(50), default="SYNCED")
 
     owner_user = relationship("User", backref="calendar_sync_items")
+
+
+class GoogleOAuthState(Base):
+    __tablename__ = "google_oauth_states"
+
+    id = Column(Integer, primary_key=True, index=True)
+    state = Column(String(255), unique=True, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)
+    used = Column(Integer, default=0, nullable=False, index=True)  # 0 = unused, 1 = consumed
+
+    user = relationship("User")
+

@@ -32,7 +32,7 @@ from app.models.file import ProjectFile
 from app.models.finance import PaymentRecord
 from app.models.activity import ActivityLog
 from app.models.category import PortfolioCategory, PortfolioSubcategory
-from app.models.google_calendar import GoogleCalendarConnection, CalendarSyncItem
+from app.models.google_calendar import GoogleCalendarConnection, CalendarSyncItem, GoogleOAuthState
 
 # Public API Routers
 from app.api.projects import router as projects_router
@@ -83,6 +83,16 @@ try:
 except Exception as err:
     logger.warning(f"[STARTUP NOTE] Migration check: {err}")
 
+# Validate Google Calendar configuration at startup
+gc_conf = settings.validate_google_calendar_configuration()
+if gc_conf["configured"] and not gc_conf["valid"]:
+    for err in gc_conf["errors"]:
+        logger.error(f"[GOOGLE CALENDAR CONFIG ERROR] {err}")
+elif not gc_conf["configured"]:
+    logger.info("[GOOGLE CALENDAR] OAuth not configured or missing client credentials.")
+else:
+    logger.info("[GOOGLE CALENDAR] OAuth configuration validated successfully.")
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
@@ -93,12 +103,20 @@ app = FastAPI(
 )
 
 # Configure CORS
+cors_kwargs = {
+    "allow_origins": settings.CORS_ORIGINS,
+    "allow_credentials": True,
+    "allow_methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    "allow_headers": ["*"],
+}
+
+if not settings.IS_PRODUCTION:
+    # In development mode, allow any local development server port (e.g. 5173, 5174, 5175, 3000, etc.)
+    cors_kwargs["allow_origin_regex"] = r"^https?:\/\/(localhost|127\.0\.0\.1)(:[0-9]+)?$"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["*"],
+    **cors_kwargs
 )
 
 # Mount Public API Routers

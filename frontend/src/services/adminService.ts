@@ -153,6 +153,14 @@ export const adminService = {
     return handleResponse<ProjectMilestone>(res);
   },
 
+  async deleteProjectMilestone(milestoneId: number): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/admin/projects/milestones/${milestoneId}`, {
+      method: "DELETE",
+      headers: authHeaders()
+    });
+    return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
   // ============================================================================
   // CLIENTS
   // ============================================================================
@@ -446,9 +454,14 @@ export const adminService = {
   // ============================================================================
   async getGoogleCalendarStatus(): Promise<{
     connected: boolean;
+    status: string;
     google_account_email?: string;
     calendar_id?: string;
+    last_synced_at?: string;
     updated_at?: string;
+    client_id_configured?: boolean;
+    configuration_valid?: boolean;
+    configuration_errors?: string[];
   }> {
     const res = await fetch(`${API_BASE}/admin/google-calendar/status`, {
       headers: authHeaders()
@@ -463,7 +476,7 @@ export const adminService = {
     return handleResponse(res);
   },
 
-  async disconnectGoogleCalendar(): Promise<{ status: string }> {
+  async disconnectGoogleCalendar(): Promise<{ message: string; status?: string }> {
     const res = await fetch(`${API_BASE}/admin/google-calendar/disconnect`, {
       method: "POST",
       headers: authHeaders()
@@ -482,7 +495,17 @@ export const adminService = {
     return handleResponse(res);
   },
 
-  async syncGoogleCalendar(): Promise<{ status: string; total_google_events?: number }> {
+  async syncGoogleCalendar(): Promise<{
+    success: boolean;
+    status: string;
+    pushed_to_google: number;
+    pulled_from_google: number;
+    failed_pushes?: number;
+    last_synced_at?: string;
+    message: string;
+    errors?: string[];
+    total_google_events?: number;
+  }> {
     const res = await fetch(`${API_BASE}/admin/google-calendar/sync`, {
       method: "POST",
       headers: authHeaders()
@@ -490,7 +513,7 @@ export const adminService = {
     return handleResponse(res);
   },
 
-  async pushTaskToGoogle(taskId: number): Promise<{ status: string; google_event_id?: string }> {
+  async pushTaskToGoogle(taskId: number): Promise<{ message: string; google_event_id?: string; status?: string }> {
     const res = await fetch(`${API_BASE}/admin/google-calendar/push-task/${taskId}`, {
       method: "POST",
       headers: authHeaders()

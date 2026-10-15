@@ -314,6 +314,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const rawHash = window.location.hash;
+    if (rawHash.includes("tab=meetings") || rawHash.includes("calendar_connected") || rawHash.includes("calendar_error")) {
+      setActiveTab("meetings");
+    }
+  }, []);
+
+  useEffect(() => {
     adminService.getDashboardStats().then(setStats).catch(() => {});
   }, [activeTab]);
 

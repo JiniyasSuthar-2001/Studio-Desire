@@ -10,6 +10,8 @@ class GoogleCalendarStatusOut(BaseModel):
     calendar_id: Optional[str] = "primary"
     last_synced_at: Optional[datetime] = None
     client_id_configured: bool = False
+    configuration_valid: bool = True
+    configuration_errors: List[str] = []
 
 
 class GoogleCalendarOAuthStartOut(BaseModel):
@@ -40,7 +42,11 @@ class GoogleCalendarEventItem(BaseModel):
 
 class GoogleCalendarSyncResponse(BaseModel):
     success: bool
-    pushed_to_google: int
-    pulled_from_google: int
-    last_synced_at: datetime
+    status: str = "COMPLETED"  # "COMPLETED", "PARTIAL", "FAILED", "DISCONNECTED"
+    pushed_to_google: int = 0
+    pulled_from_google: int = 0
+    failed_pushes: int = 0
+    last_synced_at: Optional[datetime] = None
     message: str
+    errors: List[str] = []
+
